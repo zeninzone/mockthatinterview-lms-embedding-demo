@@ -1,4 +1,4 @@
-import { Building2, MapPin } from 'lucide-react';
+import { ArrowLeft, Building2, MapPin } from 'lucide-react';
 
 const roles = [
   {
@@ -39,9 +39,13 @@ const roles = [
   },
 ];
 
-export function PlacementsPage({ primaryColor }) {
+export function PlacementsPage({ primaryColor, institutionName, onBackToPortal }) {
   return (
     <div className="page placementsPage">
+      <button type="button" className="portalBackLink" onClick={onBackToPortal}>
+        <ArrowLeft size={18} aria-hidden />
+        Back to {institutionName}
+      </button>
       <div className="pageHeader">
         <div>
           <h2 className="pageHeader__title">Placements & opportunities</h2>

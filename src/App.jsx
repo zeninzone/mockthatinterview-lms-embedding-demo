@@ -7,6 +7,7 @@ import { CohortsPage } from './pages/CohortsPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { InterviewPracticePage } from './pages/InterviewPracticePage';
 import { PlacementsPage } from './pages/PlacementsPage';
+import { navIdFromHash, setNavHash } from './hashNav';
 import { useEmbedDemoState } from './useEmbedDemoState';
 
 function learnerInitials(firstName, lastName) {
@@ -18,12 +19,18 @@ function learnerInitials(firstName, lastName) {
 
 export const App = () => {
   const embed = useEmbedDemoState();
-  const [nav, setNav] = useState('dashboard');
+  const [nav, setNav] = useState(() => navIdFromHash());
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isHostAuthenticated, setHostAuthenticated] = useState(false);
   const [interviewPracticeStep, setInterviewPracticeStep] = useState('setup');
 
   const primary = embed.org.primaryColor || '#047857';
+
+  useEffect(() => {
+    const onHashChange = () => setNav(navIdFromHash());
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   useEffect(() => {
     if (nav !== 'interview') {
@@ -67,11 +74,22 @@ export const App = () => {
     });
   }, [embed]);
 
+  const backToPortal = useCallback(() => {
+    flushSync(() => {
+      embed.setAppliedIframeSrc('');
+      embed.setIframeLoadKey(0);
+      setInterviewPracticeStep('setup');
+      setNav('dashboard');
+      setNavHash('dashboard');
+    });
+  }, [embed]);
+
   const immersivePractice = nav === 'interview' && interviewPracticeStep === 'session';
   const interviewSetupChrome = nav === 'interview' && interviewPracticeStep === 'setup';
 
   const handleNavigate = (id) => {
     setNav(id);
+    setNavHash(id);
     setMobileNavOpen(false);
     if (id !== 'interview') {
       setInterviewPracticeStep('setup');
@@ -89,6 +107,7 @@ export const App = () => {
         onPracticeStepChange={setInterviewPracticeStep}
         onPrepareAndEnterPractice={enterInterviewPracticeSession}
         onResetPracticeSession={resetInterviewPracticeSession}
+        onBackToPortal={backToPortal}
         institutionName={embed.org.institutionName}
         org={embed.org}
         student={embed.student}
@@ -110,7 +129,11 @@ export const App = () => {
         iframeLoadKey={embed.iframeLoadKey}
       />
     ) : (
-      <PlacementsPage primaryColor={primary} />
+      <PlacementsPage
+        primaryColor={primary}
+        institutionName={embed.org.institutionName}
+        onBackToPortal={() => handleNavigate('dashboard')}
+      />
     );
 
   const rootClass = ['lms-root'];

@@ -5,6 +5,7 @@ export function InterviewPracticePage({
   onPracticeStepChange,
   onPrepareAndEnterPractice,
   onResetPracticeSession,
+  onBackToPortal,
   institutionName,
   org,
   student,
@@ -35,13 +36,16 @@ export function InterviewPracticePage({
         <header className="embedPractice__bar">
           <button
             type="button"
-            className="embedPractice__back iconButton"
-            onClick={() => onPracticeStepChange('setup')}
-            aria-label="Back to setup"
+            className="embedPractice__back"
+            onClick={onBackToPortal}
+            aria-label={`Back to ${institutionName}`}
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={18} aria-hidden />
+            <span>Back to {institutionName}</span>
           </button>
-          <span className="embedPractice__context">{institutionName}</span>
+          <span className="embedPractice__context" aria-hidden>
+            Practice
+          </span>
           <div className="embedPractice__actions">
             <button type="button" className="btn btn--secondary btn--small" onClick={onResetPracticeSession}>
               Sign out & exit
@@ -98,7 +102,9 @@ export function InterviewPracticePage({
         ) : null}
         <div className="configGrid">
           <label className="configGrid__full">
-            MTI API base URL (Nest — <code>mti_api_base</code>)
+            <span className="fieldLabel">
+              MTI API base URL (Nest — <code>mti_api_base</code>)
+            </span>
             <input
               value={apiBaseUrl}
               onChange={(e) => setApiBaseUrl(e.target.value)}
