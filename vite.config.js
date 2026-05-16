@@ -1,7 +1,29 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+/**
+ * Resolve Vite `base` for static hosting.
+ * - Local / non-CI builds: `/`
+ * - GitHub Actions: `GITHUB_REPOSITORY` is `owner/repo` → project Pages use `/repo/`;
+ *   repos named `owner.github.io` (user/org site) use `/`
+ * - Override anytime: `VITE_PAGES_BASE=/my-subpath/` (must start and end with `/` for subpaths)
+ */
+function resolveBase() {
+  const manual = process.env.VITE_PAGES_BASE;
+  if (manual) {
+    return manual.endsWith('/') ? manual : `${manual}/`;
+  }
+  const repo = process.env.GITHUB_REPOSITORY;
+  if (!repo) return '/';
+  const [owner, name] = repo.split('/');
+  if (!owner || !name) return '/';
+  if (name === `${owner}.github.io`) return '/';
+  return `/${name}/`;
+}
+
+// https://vitejs.dev/config/
 export default defineConfig({
+  base: resolveBase(),
   plugins: [react()],
   server: {
     port: 4174,
