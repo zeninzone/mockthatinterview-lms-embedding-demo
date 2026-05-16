@@ -28,6 +28,9 @@ jobs:
       - run: npm ci
       # `GITHUB_REPOSITORY` is set on GitHub-hosted runners; vite.config.js derives Vite `base` for Pages.
       - run: npm run build
+        env:
+          # Deployed MTI learner SPA the iframe loads (bootstrap + embedded app — match env to org token / backend).
+          VITE_APP_FRONTEND_URL: https://app.dev.mockthatinterview.com
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
