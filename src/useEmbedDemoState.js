@@ -71,17 +71,19 @@ export function useEmbedDemoState() {
     return url.toString();
   }, [org, student, accessToken, refreshToken, frontendUrl, simulateAuth, apiToken, apiBaseUrl]);
 
-  const handleLoadEmbed = () => {
+  const handleLoadEmbed = useCallback(() => {
     try {
       setAppliedIframeSrc(buildIframeSrc());
       setIframeLoadKey((k) => k + 1);
+      return true;
     } catch (err) {
       console.error(err);
       window.alert(
         'Could not build embed URL. Check that “MockThatInterview frontend URL” is a valid absolute URL (e.g. http://localhost:5173).',
       );
+      return false;
     }
-  };
+  }, [buildIframeSrc]);
 
   return {
     frontendUrl,

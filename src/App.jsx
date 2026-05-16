@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
 
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
@@ -20,8 +21,15 @@ export const App = () => {
   const [nav, setNav] = useState('dashboard');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isHostAuthenticated, setHostAuthenticated] = useState(false);
+  const [interviewPracticeStep, setInterviewPracticeStep] = useState('setup');
 
   const primary = embed.org.primaryColor || '#047857';
+
+  useEffect(() => {
+    if (nav !== 'interview') {
+      setInterviewPracticeStep('setup');
+    }
+  }, [nav]);
 
   const handleToggleHost = () => {
     setHostAuthenticated((prev) => {
@@ -29,9 +37,45 @@ export const App = () => {
       if (!next) {
         embed.setAppliedIframeSrc('');
         embed.setIframeLoadKey(0);
+        setInterviewPracticeStep('setup');
       }
       return next;
     });
+  };
+
+  /** One flush: host demo on + iframe URL + step 2 together (avoid half-applied intermediate state). */
+  const enterInterviewPracticeSession = useCallback(() => {
+    let ok = false;
+    flushSync(() => {
+      setHostAuthenticated(true);
+      ok = embed.handleLoadEmbed();
+      if (!ok) {
+        setHostAuthenticated(false);
+        return;
+      }
+      setInterviewPracticeStep('session');
+    });
+    return ok;
+  }, [embed]);
+
+  const resetInterviewPracticeSession = useCallback(() => {
+    flushSync(() => {
+      embed.setAppliedIframeSrc('');
+      embed.setIframeLoadKey(0);
+      setHostAuthenticated(false);
+      setInterviewPracticeStep('setup');
+    });
+  }, [embed]);
+
+  const immersivePractice = nav === 'interview' && interviewPracticeStep === 'session';
+  const interviewSetupChrome = nav === 'interview' && interviewPracticeStep === 'setup';
+
+  const handleNavigate = (id) => {
+    setNav(id);
+    setMobileNavOpen(false);
+    if (id !== 'interview') {
+      setInterviewPracticeStep('setup');
+    }
   };
 
   const main =
@@ -41,7 +85,11 @@ export const App = () => {
       <CohortsPage primaryColor={primary} />
     ) : nav === 'interview' ? (
       <InterviewPracticePage
-        isHostAuthenticated={isHostAuthenticated}
+        practiceStep={interviewPracticeStep}
+        onPracticeStepChange={setInterviewPracticeStep}
+        onPrepareAndEnterPractice={enterInterviewPracticeSession}
+        onResetPracticeSession={resetInterviewPracticeSession}
+        institutionName={embed.org.institutionName}
         org={embed.org}
         student={embed.student}
         accessToken={embed.accessToken}
@@ -60,31 +108,49 @@ export const App = () => {
         setSimulateAuth={embed.setSimulateAuth}
         appliedIframeSrc={embed.appliedIframeSrc}
         iframeLoadKey={embed.iframeLoadKey}
-        onLoadEmbed={embed.handleLoadEmbed}
       />
     ) : (
       <PlacementsPage primaryColor={primary} />
     );
 
+  const rootClass = ['lms-root'];
+  if (immersivePractice) {
+    rootClass.push('lms-root--practiceSessionRoot');
+  } else if (interviewSetupChrome) {
+    rootClass.push('lms-root--embedRoute');
+  }
+
+  let mainScrollClass = 'lms-scroll';
+  if (immersivePractice) {
+    mainScrollClass += ' lms-scroll--practiceSession';
+  } else if (interviewSetupChrome) {
+    mainScrollClass += ' lms-scroll--embedFill';
+  }
+
   return (
-    <div className="lms-root" style={{ '--lms-primary': primary }}>
-      <Sidebar
-        institutionName={embed.org.institutionName}
-        activeId={nav}
-        onNavigate={setNav}
-        mobileOpen={mobileNavOpen}
-        onCloseMobile={() => setMobileNavOpen(false)}
-      />
-      <div className="lms-main">
-        <TopBar
-          activeId={nav}
+    <div className={rootClass.join(' ')} style={{ '--lms-primary': primary }}>
+      {!immersivePractice ? (
+        <Sidebar
           institutionName={embed.org.institutionName}
-          isHostAuthenticated={isHostAuthenticated}
-          onToggleHost={handleToggleHost}
-          userInitials={learnerInitials(embed.student.firstName, embed.student.lastName)}
-          onOpenNav={() => setMobileNavOpen(true)}
+          activeId={nav}
+          onNavigate={handleNavigate}
+          mobileOpen={mobileNavOpen}
+          onCloseMobile={() => setMobileNavOpen(false)}
         />
-        <main className="lms-scroll">{main}</main>
+      ) : null}
+      <div className="lms-main">
+        {!immersivePractice ? (
+          <TopBar
+            dense={interviewSetupChrome}
+            activeId={nav}
+            institutionName={embed.org.institutionName}
+            isHostAuthenticated={isHostAuthenticated}
+            onToggleHost={handleToggleHost}
+            userInitials={learnerInitials(embed.student.firstName, embed.student.lastName)}
+            onOpenNav={() => setMobileNavOpen(true)}
+          />
+        ) : null}
+        <main className={mainScrollClass}>{main}</main>
       </div>
     </div>
   );

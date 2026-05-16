@@ -35,6 +35,7 @@ body {
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* --- Shell --- */
@@ -59,6 +60,210 @@ body {
   flex: 1;
   padding: 0 clamp(18px, 3vw, 32px) 32px;
   overflow-x: hidden;
+}
+
+/* Interview route: viewport shell so the iframe fills remaining height (no clipped embed). */
+
+.lms-root--embedRoute {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.lms-root--embedRoute .lms-main {
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.lms-root--embedRoute .topbar {
+  flex-shrink: 0;
+}
+
+.lms-root--embedRoute .lms-scroll--embedFill {
+  flex: 1 1 auto;
+}
+
+.lms-scroll--embedFill {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 6px clamp(14px, 2vw, 28px) 10px;
+}
+
+/* Step 1: interview setup wizard (configure only). */
+
+.interviewSetupPage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vw, 18px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.setupHeader.setupHeader {
+  margin-bottom: 0;
+}
+
+.setupHeader__title {
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+}
+
+.setupHeader__lead {
+  margin-top: 8px;
+  max-width: 62ch;
+}
+
+.setupConfigPanel__heading {
+  margin: 0 0 10px;
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.setupWizardActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.setupWizardActions__copy {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.setupWizardActions__badge {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--lms-primary) 14%, transparent);
+  color: var(--lms-primary);
+}
+
+.setupWizardActions__hint {
+  margin: 0;
+}
+
+.setupWizardActions__cta {
+  min-width: 220px;
+  padding-inline: 22px;
+}
+
+/* Step 2: practice — no LMS chrome (sidebar/topbar hidden in App); feels like entering the real app. */
+
+.lms-root--practiceSessionRoot {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.lms-root--practiceSessionRoot .lms-main {
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.lms-scroll--practiceSession {
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.embedPractice {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  background: var(--surface);
+}
+
+.embedPractice__bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.97);
+}
+
+.embedPractice__back {
+  color: var(--text);
+}
+
+.embedPractice__context {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.embedPractice__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.embedPractice__viewport {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background: #fff;
+}
+
+.embedPractice__frame {
+  border: none;
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.embedPractice__fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  text-align: center;
+  background: var(--shell-bg);
+  color: var(--muted);
+  font-weight: 500;
 }
 
 /* --- Sidebar --- */
@@ -297,6 +502,24 @@ body {
   border-radius: 50%;
   background: var(--lms-primary);
   border: 2px solid #fff;
+}
+
+/* Interview route: reclaim one grid row — search is decorative in this demo. */
+
+.topbar--embedDense {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: 8px clamp(14px, 2vw, 28px);
+  margin-bottom: 4px;
+}
+
+.topbar--embedDense .topbar__center {
+  display: none;
+}
+
+.topbar--embedDense .topbar__title {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.2;
 }
 
 .topbar__avatar {
@@ -878,31 +1101,7 @@ body {
   font-weight: 700;
 }
 
-/* Interview / embed */
-
-.configPanel .collapseToggle {
-  width: 100%;
-}
-
-.collapseToggle {
-  border: none;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 0 12px;
-  margin-bottom: 4px;
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text);
-  cursor: pointer;
-}
-
-.collapseToggle__chev {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--lms-primary);
-}
+/* Interview setup (configure / config grid reused on step 1) */
 
 .configPanel__intro {
   margin-top: 0;
@@ -918,42 +1117,6 @@ body {
   grid-column: 1 / -1;
 }
 
-.embedPanel .embedHeader h2 {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.embedHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.embedHeader__status {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.embedToolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-
-.embedToolbar__hint {
-  flex: 1;
-  min-width: 200px;
-  font-size: 13px;
-  line-height: 1.45;
-}
-
 .emptyState {
   border: 1px dashed color-mix(in srgb, var(--muted) 45%, transparent);
   border-radius: var(--radius-lg);
@@ -963,14 +1126,6 @@ body {
   font-weight: 500;
   font-size: 15px;
   background: #fafbfc;
-}
-
-.embedFrame {
-  width: 100%;
-  height: clamp(440px, calc(100vh - 340px), 900px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: white;
 }
 
 .muted {
@@ -1024,10 +1179,6 @@ textarea:focus {
 
 .warningBanner code {
   font-size: 13px;
-}
-
-.configPanel + .embedPanel {
-  margin-top: 18px;
 }
 
 /* Responsive */
@@ -1086,6 +1237,12 @@ textarea:focus {
 
   .sidebar__closeMobile {
     display: grid;
+  }
+
+  /* Keep embed layout on one header row — no full-width faux search stealing height. */
+  .topbar.topbar--embedDense {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto;
   }
 
   .topbar {

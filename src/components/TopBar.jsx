@@ -9,11 +9,12 @@ export function TopBar({
   onToggleHost,
   onOpenNav,
   userInitials,
+  dense,
 }) {
   const title = NAV_TITLES[activeId] ?? 'Portal';
 
   return (
-    <header className="topbar">
+    <header className={`topbar ${dense ? 'topbar--embedDense' : ''}`}>
       <div className="topbar__left">
         <button
           type="button"
