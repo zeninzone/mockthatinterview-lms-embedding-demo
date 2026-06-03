@@ -6,7 +6,6 @@ import { TopBar } from './components/TopBar';
 import { CohortsPage } from './pages/CohortsPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { InterviewPracticePage } from './pages/InterviewPracticePage';
-import { PlacementsPage } from './pages/PlacementsPage';
 import { navIdFromHash, setNavHash } from './hashNav';
 import { useEmbedDemoState } from './useEmbedDemoState';
 
@@ -38,16 +37,19 @@ export const App = () => {
     }
   }, [nav]);
 
-  const handleToggleHost = () => {
-    setHostAuthenticated((prev) => {
-      const next = !prev;
-      if (!next) {
-        embed.setAppliedIframeSrc('');
-        embed.setIframeLoadKey(0);
-        setInterviewPracticeStep('setup');
-      }
-      return next;
-    });
+  const handleSignOutHost = () => {
+    embed.setAppliedIframeSrc('');
+    embed.setIframeLoadKey(0);
+    setInterviewPracticeStep('setup');
+    setHostAuthenticated(false);
+  };
+
+  const handleTopBarPrimaryAction = () => {
+    if (isHostAuthenticated) {
+      handleSignOutHost();
+      return;
+    }
+    handleNavigate('interview');
   };
 
   /** One flush: host demo on + iframe URL + step 2 together (avoid half-applied intermediate state). */
@@ -99,8 +101,6 @@ export const App = () => {
   const main =
     nav === 'dashboard' ? (
       <DashboardPage primaryColor={primary} />
-    ) : nav === 'cohorts' ? (
-      <CohortsPage primaryColor={primary} />
     ) : nav === 'interview' ? (
       <InterviewPracticePage
         practiceStep={interviewPracticeStep}
@@ -127,11 +127,7 @@ export const App = () => {
         iframeLoadKey={embed.iframeLoadKey}
       />
     ) : (
-      <PlacementsPage
-        primaryColor={primary}
-        institutionName={embed.org.institutionName}
-        onBackToPortal={() => handleNavigate('dashboard')}
-      />
+      <CohortsPage primaryColor={primary} />
     );
 
   const rootClass = ['lms-root', `lms-root--client-${embed.clientConfig.slug}`];
@@ -167,7 +163,7 @@ export const App = () => {
             activeId={nav}
             institutionName={embed.org.institutionName}
             isHostAuthenticated={isHostAuthenticated}
-            onToggleHost={handleToggleHost}
+            onPrimaryAction={handleTopBarPrimaryAction}
             userInitials={learnerInitials(embed.student.firstName, embed.student.lastName)}
             onOpenNav={() => setMobileNavOpen(true)}
           />

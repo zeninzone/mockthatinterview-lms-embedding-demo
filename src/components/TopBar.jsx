@@ -1,4 +1,4 @@
-import { Bell, Menu, Search } from 'lucide-react';
+import { Bell, Menu } from 'lucide-react';
 
 import { NAV_TITLES } from '../nav';
 
@@ -6,7 +6,7 @@ export function TopBar({
   activeId,
   institutionName,
   isHostAuthenticated,
-  onToggleHost,
+  onPrimaryAction,
   onOpenNav,
   userInitials,
   dense,
@@ -30,13 +30,6 @@ export function TopBar({
         </div>
       </div>
 
-      <div className="topbar__center">
-        <label className="topbar__search">
-          <Search size={18} className="topbar__searchIcon" aria-hidden />
-          <input type="search" placeholder="Search courses, people, resources…" readOnly />
-        </label>
-      </div>
-
       <div className="topbar__right">
         <button type="button" className="topbar__iconBtn" aria-label="Notifications (demo)">
           <Bell size={20} />
@@ -45,8 +38,8 @@ export function TopBar({
         <div className="topbar__avatar" title="Demo learner">
           {userInitials}
         </div>
-        <button className="btn btn--primary" type="button" onClick={onToggleHost}>
-          {isHostAuthenticated ? 'Sign out' : 'Sign in as host'}
+        <button className="btn btn--primary" type="button" onClick={onPrimaryAction}>
+          {isHostAuthenticated ? 'Sign out' : 'Go to Interview practice'}
         </button>
       </div>
     </header>

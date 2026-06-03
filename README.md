@@ -29,7 +29,7 @@ npm install
 
 **CodeYourFuture only:** `npm run dev:cyf` — set `VITE_MTI_ORG_API_TOKEN` (or `VITE_MTI_ORG_API_TOKEN_CYF`) and `VITE_CYF_ORGANIZATION_ID` in `.env.local`
 
-Open the demo (default port **4174**), sign in as “host”, and open Interview Practice to load the iframe.
+Open the demo (default port **4174**), use **Go to Interview practice** in the header (or the sidebar), then **Sign in & start practice** to load the iframe.
 
 ### Dev client picker (all organisations)
 

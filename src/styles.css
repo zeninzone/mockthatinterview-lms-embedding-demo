@@ -509,7 +509,7 @@ body {
   top: 0;
   z-index: 10;
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 1.4fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 16px;
   padding: 14px clamp(18px, 3vw, 32px);
@@ -555,34 +555,6 @@ body {
   letter-spacing: -0.03em;
 }
 
-.topbar__search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.topbar__search input {
-  border: none;
-  background: transparent;
-  flex: 1;
-  padding: 10px 0;
-  font: inherit;
-  font-size: 14px;
-  min-width: 0;
-}
-
-.topbar__search input:focus {
-  outline: none;
-}
-
-.topbar__searchIcon {
-  color: var(--muted);
-}
-
 .topbar__right {
   display: flex;
   align-items: center;
@@ -618,17 +590,10 @@ body {
   border: 2px solid #fff;
 }
 
-/* Interview route: reclaim one grid row — search is decorative in this demo. */
-
 .topbar--embedDense {
-  grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
   padding: 8px clamp(14px, 2vw, 28px);
   margin-bottom: 4px;
-}
-
-.topbar--embedDense .topbar__center {
-  display: none;
 }
 
 .topbar--embedDense .topbar__title {
@@ -1117,104 +1082,6 @@ body {
   background: #f8fafc;
 }
 
-/* Placements */
-
-.roleGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.roleCard {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  padding: 18px;
-  box-shadow: var(--shadow-sm);
-}
-
-.roleCard:hover {
-  box-shadow: var(--shadow-md);
-  transition: box-shadow 0.2s ease;
-}
-
-.roleCard__head {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  align-items: center;
-}
-
-.roleCard__co {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.roleCard__pill {
-  border: 1px solid;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  padding: 4px 10px;
-  border-radius: 999px;
-}
-
-.roleCard__title {
-  margin: 12px 0 8px;
-  font-size: 1.25rem;
-  letter-spacing: -0.02em;
-}
-
-.roleCard__loc {
-  margin: 0;
-  font-size: 13px;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.roleCard__type {
-  margin: 6px 0 12px;
-  font-size: 13px;
-  color: var(--text);
-  font-weight: 500;
-}
-
-.roleCard__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.tag {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #f1f5f9;
-  border: 1px solid var(--border);
-}
-
-.roleCard__foot {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.roleCard__match {
-  font-size: 13px;
-  font-weight: 700;
-}
-
 /* Interview setup (configure / config grid reused on step 1) */
 
 .configPanel__intro {
@@ -1397,11 +1264,6 @@ textarea:focus {
 
   .topbar {
     grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
-  }
-
-  .topbar__center {
-    grid-column: 1 / -1;
   }
 
   .topbar__menu {
@@ -1409,10 +1271,6 @@ textarea:focus {
   }
 
   .dashGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .roleGrid {
     grid-template-columns: 1fr;
   }
 

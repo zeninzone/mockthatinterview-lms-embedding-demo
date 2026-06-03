@@ -1,15 +1,8 @@
-import {
-  Briefcase,
-  LayoutDashboard,
-  Mic,
-  PanelLeftClose,
-  Users,
-  X,
-} from 'lucide-react';
+import { LayoutDashboard, Mic, PanelLeftClose, Users, X } from 'lucide-react';
 
 import { NAV_ITEMS } from '../nav';
 
-const icons = { LayoutDashboard, Users, Mic, Briefcase };
+const icons = { LayoutDashboard, Mic, Users };
 
 export function Sidebar({
   institutionName,
