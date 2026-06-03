@@ -320,16 +320,16 @@ body {
 /* --- Sidebar --- */
 
 .lms-root--client-codeyourfuture {
-  --sidebar-bg: #5c0a0a;
-  --sidebar-gradient-top: #d80f0f;
-  --sidebar-gradient-bottom: #1f0808;
-  --sidebar-edge: rgba(255, 210, 210, 0.14);
-  --sidebar-text: #fff5f5;
-  --sidebar-text-muted: rgba(255, 220, 220, 0.72);
-  --sidebar-link: rgba(255, 235, 235, 0.88);
-  --sidebar-link-hover-bg: rgba(255, 255, 255, 0.1);
-  --sidebar-link-hover-text: #ffffff;
-  --sidebar-footer-text: rgba(255, 200, 200, 0.55);
+  --sidebar-bg: #ffffff;
+  --sidebar-gradient-top: #ffffff;
+  --sidebar-gradient-bottom: #ffffff;
+  --sidebar-edge: rgba(15, 23, 42, 0.1);
+  --sidebar-text: #0f172a;
+  --sidebar-text-muted: #64748b;
+  --sidebar-link: #475569;
+  --sidebar-link-hover-bg: color-mix(in srgb, var(--lms-primary) 10%, transparent);
+  --sidebar-link-hover-text: #0f172a;
+  --sidebar-footer-text: #94a3b8;
 }
 
 .sidebarScrim {
@@ -378,6 +378,11 @@ body {
   background: #fff;
   padding: 4px;
   flex-shrink: 0;
+}
+
+.lms-root--client-codeyourfuture .sidebar__logo {
+  background: transparent;
+  padding: 0;
 }
 
 .sidebar__brandText {
@@ -439,12 +444,17 @@ body {
 }
 
 .lms-root--client-codeyourfuture .sidebar__link--active {
-  background: rgba(255, 255, 255, 0.14);
-  box-shadow: inset 3px 0 0 #fff;
+  background: color-mix(in srgb, var(--lms-primary) 12%, transparent);
+  color: var(--lms-primary);
+  box-shadow: inset 3px 0 0 var(--lms-primary);
 }
 
 .sidebar__link--active .sidebar__linkIcon {
   color: #fff;
+}
+
+.lms-root--client-codeyourfuture .sidebar__link--active .sidebar__linkIcon {
+  color: var(--lms-primary);
 }
 
 .sidebar__footer {
