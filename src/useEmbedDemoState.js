@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { getActiveClientConfig } from './clients';
 import { buildEmbedContext } from './embedContext';
+import { generateCyfExternalUserId } from './utils/cyfExternalUserId';
 
 const clientConfig = getActiveClientConfig();
 
@@ -14,6 +15,22 @@ const DEFAULT_ORG_API_TOKEN =
     ? import.meta.env.VITE_MTI_ORG_API_TOKEN_CYF || ''
     : '');
 
+const CYF_ENV_ORGANIZATION_ID = import.meta.env.VITE_CYF_ORGANIZATION_ID?.trim() || '';
+
+function effectiveApiToken(formToken) {
+  const trimmed = formToken.trim();
+  if (trimmed) return trimmed;
+  if (clientConfig.slug === 'codeyourfuture') return DEFAULT_ORG_API_TOKEN.trim();
+  return '';
+}
+
+function effectiveOrganizationId(formOrgId) {
+  const trimmed = formOrgId.trim();
+  if (trimmed) return trimmed;
+  if (clientConfig.slug === 'codeyourfuture') return CYF_ENV_ORGANIZATION_ID;
+  return '';
+}
+
 /** Nest API base for `POST /embed/bootstrap` — passed as `mti_api_base` on the iframe URL (see mockthatinterview-frontend bootstrap). */
 const DEFAULT_MTI_API_BASE =
   import.meta.env.VITE_MTI_API_BASE_URL?.trim() ||
@@ -21,11 +38,12 @@ const DEFAULT_MTI_API_BASE =
 
 export function useEmbedDemoState() {
   const [frontendUrl, setFrontendUrl] = useState(DEFAULT_FRONTEND_URL);
-  const [apiBaseUrl, setApiBaseUrl] = useState(DEFAULT_MTI_API_BASE);
   const [accessToken, setAccessToken] = useState('');
   const [refreshToken, setRefreshToken] = useState('');
   const [simulateAuth, setSimulateAuth] = useState(false);
-  const [apiToken, setApiToken] = useState(DEFAULT_ORG_API_TOKEN);
+  const [apiToken, setApiToken] = useState(
+    clientConfig.slug === 'codeyourfuture' ? '' : DEFAULT_ORG_API_TOKEN,
+  );
   const [org, setOrg] = useState({
     organizationId: clientConfig.organizationId,
     ...clientConfig.org,
@@ -42,10 +60,15 @@ export function useEmbedDemoState() {
 
     const url = new URL(base);
 
-    const trimmedToken = apiToken.trim();
+    let externalUserId = student.externalUserId.trim();
+    if (!externalUserId && clientConfig.slug === 'codeyourfuture') {
+      externalUserId = generateCyfExternalUserId(student.firstName, student.lastName);
+    }
+
+    const trimmedToken = effectiveApiToken(apiToken);
     if (trimmedToken) {
       url.searchParams.set('api_token', trimmedToken);
-      url.searchParams.set('external_user_id', student.externalUserId);
+      url.searchParams.set('external_user_id', externalUserId);
       url.searchParams.set('first_name', student.firstName);
       url.searchParams.set('last_name', student.lastName);
       if (student.email?.trim()) {
@@ -56,20 +79,21 @@ export function useEmbedDemoState() {
     const context = buildEmbedContext({
       embedIssuer: clientConfig.embedIssuer,
       ...org,
+      organizationId: effectiveOrganizationId(org.organizationId),
       ...student,
+      externalUserId,
       accessToken,
       refreshToken,
       simulateAuth,
     });
     url.searchParams.set('mti_embed_context', context);
 
-    const apiBase = apiBaseUrl.trim();
-    if (apiBase) {
-      url.searchParams.set('mti_api_base', apiBase);
+    if (DEFAULT_MTI_API_BASE) {
+      url.searchParams.set('mti_api_base', DEFAULT_MTI_API_BASE);
     }
 
     return url.toString();
-  }, [org, student, accessToken, refreshToken, frontendUrl, simulateAuth, apiToken, apiBaseUrl]);
+  }, [org, student, accessToken, refreshToken, frontendUrl, simulateAuth, apiToken]);
 
   const handleLoadEmbed = useCallback(() => {
     try {
@@ -89,8 +113,6 @@ export function useEmbedDemoState() {
     clientConfig,
     frontendUrl,
     setFrontendUrl,
-    apiBaseUrl,
-    setApiBaseUrl,
     accessToken,
     setAccessToken,
     refreshToken,

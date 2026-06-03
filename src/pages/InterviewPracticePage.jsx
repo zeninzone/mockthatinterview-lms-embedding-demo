@@ -1,4 +1,21 @@
 import { ArrowLeft } from 'lucide-react';
+import { flushSync } from 'react-dom';
+
+import { getActiveClientConfig } from '../clients';
+import { generateCyfExternalUserId } from '../utils/cyfExternalUserId';
+
+const clientConfig = getActiveClientConfig();
+const isCyfDemo = clientConfig.slug === 'codeyourfuture';
+const showApiTokenWarning = !isCyfDemo;
+
+function ConfigSection({ description, variant, children }) {
+  return (
+    <div className={`setupConfigSection setupConfigSection--${variant}`}>
+      {description ? <p className="muted setupConfigSection__lead">{description}</p> : null}
+      <div className="configGrid">{children}</div>
+    </div>
+  );
+}
 
 export function InterviewPracticePage({
   practiceStep,
@@ -9,24 +26,211 @@ export function InterviewPracticePage({
   institutionName,
   org,
   student,
-  simulateAuth,
   apiToken,
   frontendUrl,
   setFrontendUrl,
-  apiBaseUrl,
-  setApiBaseUrl,
   setApiToken,
   setOrg,
   setStudent,
+  accessToken,
+  refreshToken,
+  simulateAuth,
   setAccessToken,
   setRefreshToken,
   setSimulateAuth,
   appliedIframeSrc,
   iframeLoadKey,
-  accessToken,
-  refreshToken,
 }) {
+  const lockedFieldClass = isCyfDemo ? 'field--locked' : undefined;
+
+  function syncCyfExternalUserId(firstName, lastName) {
+    setStudent((prev) => ({
+      ...prev,
+      externalUserId: generateCyfExternalUserId(firstName, lastName),
+    }));
+  }
+
+  const fixedFields = (
+    <>
+      <label className={lockedFieldClass}>
+        MockThatInterview frontend URL
+        <input
+          value={frontendUrl}
+          onChange={(e) => setFrontendUrl(e.target.value)}
+          readOnly={isCyfDemo}
+        />
+      </label>
+      {isCyfDemo ? (
+        <label className={lockedFieldClass}>
+          Organisation name
+          <input value={org.institutionName} readOnly />
+        </label>
+      ) : null}
+      <label className={lockedFieldClass}>
+        Theme
+        <select
+          value={org.theme}
+          onChange={(e) => setOrg((prev) => ({ ...prev, theme: e.target.value }))}
+          disabled={isCyfDemo}
+        >
+          <option value="light">light</option>
+          <option value="dark">dark</option>
+        </select>
+      </label>
+      <label className={lockedFieldClass}>
+        Logo URL
+        <input
+          value={org.logoUrl}
+          onChange={(e) => setOrg((prev) => ({ ...prev, logoUrl: e.target.value }))}
+          readOnly={isCyfDemo}
+        />
+      </label>
+      <label className={lockedFieldClass}>
+        Primary color
+        <input
+          value={org.primaryColor}
+          onChange={(e) => setOrg((prev) => ({ ...prev, primaryColor: e.target.value }))}
+          readOnly={isCyfDemo}
+        />
+      </label>
+    </>
+  );
+
+  const editableFields = (
+    <>
+      {!isCyfDemo ? (
+        <label>
+          MockThatInterview frontend URL
+          <input value={frontendUrl} onChange={(e) => setFrontendUrl(e.target.value)} />
+        </label>
+      ) : null}
+      <label>
+        <span className="fieldLabel">Organisation API token (dev only)</span>
+        <input
+          value={apiToken}
+          onChange={(e) => setApiToken(e.target.value)}
+          autoComplete="off"
+          spellCheck={false}
+          placeholder={
+            isCyfDemo ? 'Organisation API key from admin' : 'Paste organisation api_key from admin'
+          }
+        />
+      </label>
+      <label>
+        <span className="fieldLabel">Organization ID (branding context)</span>
+        <input
+          value={org.organizationId}
+          onChange={(e) => setOrg((prev) => ({ ...prev, organizationId: e.target.value }))}
+          placeholder={isCyfDemo ? 'Organisation UUID from admin' : 'Paste organisation id from admin'}
+        />
+      </label>
+      {!isCyfDemo ? (
+        <label>
+          Institution name
+          <input
+            value={org.institutionName}
+            onChange={(e) => setOrg((prev) => ({ ...prev, institutionName: e.target.value }))}
+          />
+        </label>
+      ) : null}
+      {!isCyfDemo ? (
+        <>
+          <label>
+            Theme
+            <select value={org.theme} onChange={(e) => setOrg((prev) => ({ ...prev, theme: e.target.value }))}>
+              <option value="light">light</option>
+              <option value="dark">dark</option>
+            </select>
+          </label>
+          <label>
+            Logo URL
+            <input value={org.logoUrl} onChange={(e) => setOrg((prev) => ({ ...prev, logoUrl: e.target.value }))} />
+          </label>
+          <label>
+            Primary color
+            <input
+              value={org.primaryColor}
+              onChange={(e) => setOrg((prev) => ({ ...prev, primaryColor: e.target.value }))}
+            />
+          </label>
+        </>
+      ) : null}
+      <div className="configGrid__nameRow">
+        <label>
+          First name
+          <input
+            value={student.firstName}
+            onChange={(e) =>
+              setStudent((prev) => ({
+                ...prev,
+                firstName: e.target.value,
+              }))
+            }
+            onBlur={
+              isCyfDemo
+                ? (e) => syncCyfExternalUserId(e.target.value, student.lastName)
+                : undefined
+            }
+          />
+        </label>
+        <label>
+          Last name
+          <input
+            value={student.lastName}
+            onChange={(e) =>
+              setStudent((prev) => ({
+                ...prev,
+                lastName: e.target.value,
+              }))
+            }
+            onBlur={
+              isCyfDemo
+                ? (e) => syncCyfExternalUserId(student.firstName, e.target.value)
+                : undefined
+            }
+          />
+        </label>
+      </div>
+      <label className={isCyfDemo ? lockedFieldClass : undefined}>
+        External user ID
+        <input
+          value={student.externalUserId}
+          onChange={(e) => setStudent((prev) => ({ ...prev, externalUserId: e.target.value }))}
+          readOnly={isCyfDemo}
+        />
+      </label>
+      <label>
+        Email (optional — omit for anonymous-email bootstrap)
+        <input value={student.email} onChange={(e) => setStudent((prev) => ({ ...prev, email: e.target.value }))} />
+      </label>
+      {!isCyfDemo ? (
+        <>
+          <label>
+            Access token (optional)
+            <input value={accessToken} onChange={(e) => setAccessToken(e.target.value)} />
+          </label>
+          <label>
+            Refresh token (optional)
+            <input value={refreshToken} onChange={(e) => setRefreshToken(e.target.value)} />
+          </label>
+          <label className="inline">
+            <input checked={simulateAuth} type="checkbox" onChange={(e) => setSimulateAuth(e.target.checked)} />
+            Simulate auth (local mock session; skipped when API bootstrap succeeds)
+          </label>
+        </>
+      ) : null}
+    </>
+  );
+
   const handleContinue = () => {
+    if (isCyfDemo) {
+      flushSync(() => {
+        setStudent((prev) => ({
+          ...prev,
+          externalUserId: generateCyfExternalUserId(prev.firstName, prev.lastName),
+        }));
+      });
+    }
     onPrepareAndEnterPractice();
   };
 
@@ -88,107 +292,39 @@ export function InterviewPracticePage({
 
       <section className="panel panel--elevated setupConfigPanel">
         <h3 className="setupConfigPanel__heading">Embed configuration</h3>
-        <p className="muted configPanel__intro">
-          With an organisation API token set, the practice URL includes <code>api_token</code> plus learner fields; the
-          app calls your Nest API (e.g. <code>http://localhost:8000</code> via <code>mti_api_base</code>) for{' '}
-          <code>POST /embed/bootstrap</code>. For production use a partner BFF — never ship a long-lived key in browser
-          URLs.
-        </p>
-        {!apiToken.trim() ? (
+        {!isCyfDemo ? (
+          <p className="muted configPanel__intro">
+            With an organisation API token set, the practice URL includes <code>api_token</code> plus learner fields; the
+            app calls your Nest API (e.g. <code>http://localhost:8000</code> via <code>mti_api_base</code>) for{' '}
+            <code>POST /embed/bootstrap</code>. For production use a partner BFF — never ship a long-lived key in browser
+            URLs.
+          </p>
+        ) : null}
+        {showApiTokenWarning && !apiToken.trim() ? (
           <p className="warningBanner">
             Set <code>VITE_MTI_ORG_API_TOKEN</code> in <code>.env.local</code> or paste your org API key below so
             bootstrap can run.
           </p>
         ) : null}
-        <div className="configGrid">
-          <label className="configGrid__full">
-            <span className="fieldLabel">
-              MTI API base URL (Nest — <code>mti_api_base</code>)
-            </span>
-            <input
-              value={apiBaseUrl}
-              onChange={(e) => setApiBaseUrl(e.target.value)}
-              placeholder="http://localhost:8000"
-              spellCheck={false}
-            />
-          </label>
-          <label>
-            MockThatInterview frontend URL
-            <input value={frontendUrl} onChange={(e) => setFrontendUrl(e.target.value)} />
-          </label>
-          <label>
-            Organisation API token (dev only)
-            <input
-              value={apiToken}
-              onChange={(e) => setApiToken(e.target.value)}
-              autoComplete="off"
-              spellCheck={false}
-            />
-          </label>
-          <label>
-            Organization ID (branding context)
-            <input
-              value={org.organizationId}
-              onChange={(e) => setOrg((prev) => ({ ...prev, organizationId: e.target.value }))}
-            />
-          </label>
-          <label>
-            Institution name
-            <input
-              value={org.institutionName}
-              onChange={(e) => setOrg((prev) => ({ ...prev, institutionName: e.target.value }))}
-            />
-          </label>
-          <label>
-            Theme
-            <select value={org.theme} onChange={(e) => setOrg((prev) => ({ ...prev, theme: e.target.value }))}>
-              <option value="light">light</option>
-              <option value="dark">dark</option>
-            </select>
-          </label>
-          <label>
-            Logo URL
-            <input value={org.logoUrl} onChange={(e) => setOrg((prev) => ({ ...prev, logoUrl: e.target.value }))} />
-          </label>
-          <label>
-            Primary color
-            <input
-              value={org.primaryColor}
-              onChange={(e) => setOrg((prev) => ({ ...prev, primaryColor: e.target.value }))}
-            />
-          </label>
-          <label>
-            External user ID
-            <input
-              value={student.externalUserId}
-              onChange={(e) => setStudent((prev) => ({ ...prev, externalUserId: e.target.value }))}
-            />
-          </label>
-          <label>
-            First name
-            <input value={student.firstName} onChange={(e) => setStudent((prev) => ({ ...prev, firstName: e.target.value }))} />
-          </label>
-          <label>
-            Last name
-            <input value={student.lastName} onChange={(e) => setStudent((prev) => ({ ...prev, lastName: e.target.value }))} />
-          </label>
-          <label>
-            Email (optional — omit for anonymous-email bootstrap)
-            <input value={student.email} onChange={(e) => setStudent((prev) => ({ ...prev, email: e.target.value }))} />
-          </label>
-          <label>
-            Access token (optional)
-            <input value={accessToken} onChange={(e) => setAccessToken(e.target.value)} />
-          </label>
-          <label>
-            Refresh token (optional)
-            <input value={refreshToken} onChange={(e) => setRefreshToken(e.target.value)} />
-          </label>
-          <label className="inline">
-            <input checked={simulateAuth} type="checkbox" onChange={(e) => setSimulateAuth(e.target.checked)} />
-            Simulate auth (local mock session; skipped when API bootstrap succeeds)
-          </label>
-        </div>
+
+        {isCyfDemo ? (
+          <div className="setupConfigSections">
+            <ConfigSection
+              description="Branding and platform settings for CodeYourFuture — preset for this demo."
+              variant="fixed"
+            >
+              {fixedFields}
+            </ConfigSection>
+            <ConfigSection
+              description="Organisation and learner details before starting practice."
+              variant="editable"
+            >
+              {editableFields}
+            </ConfigSection>
+          </div>
+        ) : (
+          <div className="configGrid">{editableFields}</div>
+        )}
 
         <div className="setupWizardActions">
           <div className="setupWizardActions__copy">

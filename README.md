@@ -23,24 +23,32 @@ cd ../mockthatinterview-lms-embedding-demo
 npm install
 ```
 
-**Axia Africa:**
+**All clients (picker):** `npm run dev` → http://localhost:4174/
 
-```bash
-# .env.local: VITE_MTI_ORG_API_TOKEN=<axia organisations.api_key>
-npm run dev:axia
-```
+**Axia only:** `npm run dev:axia` — set `VITE_MTI_ORG_API_TOKEN` in `.env.local`
 
-**CodeYourFuture:**
-
-```bash
-# .env.local: VITE_MTI_ORG_API_TOKEN=<cyf organisations.api_key>
-#             VITE_CYF_ORGANIZATION_ID=<cyf organisations.id>
-npm run dev:cyf
-```
+**CodeYourFuture only:** `npm run dev:cyf` — set `VITE_MTI_ORG_API_TOKEN` (or `VITE_MTI_ORG_API_TOKEN_CYF`) and `VITE_CYF_ORGANIZATION_ID` in `.env.local`
 
 Open the demo (default port **4174**), sign in as “host”, and open Interview Practice to load the iframe.
 
-`npm run dev` is an alias for `npm run dev:axia`.
+### Dev client picker (all organisations)
+
+```bash
+npm run dev
+```
+
+| URL | What |
+|-----|------|
+| http://localhost:4174/ | **picker.html** — list Axia Africa & CodeYourFuture |
+| http://localhost:4174/codeyourfuture/ | CodeYourFuture shell |
+| http://localhost:4174/axia-africa/ | Axia Africa shell |
+
+Single-client dev (same as before, one org baked into the base path):
+
+```bash
+npm run dev:axia   # http://localhost:4174/axia-africa/
+npm run dev:cyf    # http://localhost:4174/codeyourfuture/
+```
 
 ## Deploy to GitHub Pages
 

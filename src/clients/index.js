@@ -21,14 +21,30 @@ export function getClientConfig(slug) {
 }
 
 /**
- * Active client for this Vite build (set via `VITE_CLIENT_SLUG`).
+ * @param {string} pathname
+ * @returns {string | null}
+ */
+export function resolveSlugFromPathname(pathname) {
+  const match = pathname.match(/^\/([^/]+)/);
+  const candidate = match?.[1];
+  return candidate && CLIENTS[candidate] ? candidate : null;
+}
+
+/**
+ * Active client: build-time `VITE_CLIENT_SLUG`, or in unified dev the URL path (`/<slug>/`).
  * @returns {import('./types.js').ClientConfig}
  */
 export function getActiveClientConfig() {
-  const slug = import.meta.env.VITE_CLIENT_SLUG?.trim();
+  let slug = import.meta.env.VITE_CLIENT_SLUG?.trim() || '';
+
+  if (import.meta.env.DEV && typeof window !== 'undefined') {
+    const pathSlug = resolveSlugFromPathname(window.location.pathname);
+    if (pathSlug) slug = pathSlug;
+  }
+
   if (!slug) {
     throw new Error(
-      'VITE_CLIENT_SLUG is required for the LMS demo app. Use npm run dev:axia or dev:cyf.',
+      `No client selected. Open /${CLIENT_SLUGS.join('/ or /')}/ (npm run dev) or use dev:axia / dev:cyf.`,
     );
   }
   const config = getClientConfig(slug);

@@ -134,6 +134,25 @@ body {
   font-weight: 700;
 }
 
+.setupConfigSections {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.setupConfigSection__lead {
+  margin: 0 0 14px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.setupConfigSection--fixed {
+  padding: 18px 18px 4px;
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+  background: color-mix(in srgb, var(--surface) 92%, var(--muted) 8%);
+}
+
 .setupWizardActions {
   display: flex;
   flex-wrap: wrap;
@@ -1212,6 +1231,25 @@ body {
   grid-column: 1 / -1;
 }
 
+.configGrid__nameRow {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.configGrid label.field--locked input,
+.configGrid label.field--locked select {
+  cursor: not-allowed;
+  background: color-mix(in srgb, var(--surface) 88%, var(--muted) 12%);
+  border-color: color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.configGrid input::placeholder {
+  color: color-mix(in srgb, var(--muted) 72%, transparent);
+  opacity: 1;
+}
+
 /* Label text must be one flex child — bare text + <code> siblings each stack on their own line. */
 .fieldLabel {
   display: block;
@@ -1379,6 +1417,10 @@ textarea:focus {
   }
 
   .configGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .configGrid__nameRow {
     grid-template-columns: 1fr;
   }
 }

@@ -4,9 +4,7 @@ export const codeyourfutureClient = {
   displayName: 'CodeYourFuture',
   blurb: 'Mock LMS shell for CodeYourFuture — free coding school for disadvantaged learners.',
   embedIssuer: 'cyf-lms-demo',
-  organizationId:
-    import.meta.env.VITE_CYF_ORGANIZATION_ID?.trim() ||
-    '00000000-0000-0000-0000-000000000000',
+  organizationId: import.meta.env.VITE_CYF_ORGANIZATION_ID?.trim() || '',
   org: {
     institutionName: 'CodeYourFuture',
     theme: 'light',
@@ -14,9 +12,9 @@ export const codeyourfutureClient = {
     primaryColor: '#d80f0f',
   },
   student: {
-    externalUserId: 'cyf-demo-learner-001',
-    email: 'learner.demo@codeyourfuture.io',
-    firstName: 'Demo',
-    lastName: 'Learner',
+    externalUserId: 'cyf-john-doe-001',
+    email: 'john.doe@codeyourfuture.io',
+    firstName: 'John',
+    lastName: 'Doe',
   },
 };

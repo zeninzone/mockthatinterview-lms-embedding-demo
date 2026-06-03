@@ -117,8 +117,6 @@ export const App = () => {
         apiToken={embed.apiToken}
         frontendUrl={embed.frontendUrl}
         setFrontendUrl={embed.setFrontendUrl}
-        apiBaseUrl={embed.apiBaseUrl}
-        setApiBaseUrl={embed.setApiBaseUrl}
         setApiToken={embed.setApiToken}
         setOrg={embed.setOrg}
         setStudent={embed.setStudent}
