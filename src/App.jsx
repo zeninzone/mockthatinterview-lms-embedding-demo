@@ -136,7 +136,7 @@ export const App = () => {
       />
     );
 
-  const rootClass = ['lms-root'];
+  const rootClass = ['lms-root', `lms-root--client-${embed.clientConfig.slug}`];
   if (immersivePractice) {
     rootClass.push('lms-root--practiceSessionRoot');
   } else if (interviewSetupChrome) {
