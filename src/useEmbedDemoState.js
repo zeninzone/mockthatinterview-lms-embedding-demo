@@ -1,11 +1,18 @@
 import { useCallback, useState } from 'react';
 
+import { getActiveClientConfig } from './clients';
 import { buildEmbedContext } from './embedContext';
+
+const clientConfig = getActiveClientConfig();
 
 const DEFAULT_FRONTEND_URL =
   import.meta.env.VITE_APP_FRONTEND_URL || 'http://localhost:5173';
 
-const DEFAULT_ORG_API_TOKEN = import.meta.env.VITE_MTI_ORG_API_TOKEN || '';
+const DEFAULT_ORG_API_TOKEN =
+  import.meta.env.VITE_MTI_ORG_API_TOKEN ||
+  (clientConfig.slug === 'codeyourfuture'
+    ? import.meta.env.VITE_MTI_ORG_API_TOKEN_CYF || ''
+    : '');
 
 /** Nest API base for `POST /embed/bootstrap` — passed as `mti_api_base` on the iframe URL (see mockthatinterview-frontend bootstrap). */
 const DEFAULT_MTI_API_BASE =
@@ -20,18 +27,10 @@ export function useEmbedDemoState() {
   const [simulateAuth, setSimulateAuth] = useState(false);
   const [apiToken, setApiToken] = useState(DEFAULT_ORG_API_TOKEN);
   const [org, setOrg] = useState({
-    organizationId: 'cbbef415-de23-4b15-87f4-31827c6a6d5b',
-    institutionName: 'Axia Africa',
-    theme: 'light',
-    logoUrl: 'https://placehold.co/120x40/047857/ffffff?text=Axia+Africa',
-    primaryColor: '#047857',
+    organizationId: clientConfig.organizationId,
+    ...clientConfig.org,
   });
-  const [student, setStudent] = useState({
-    externalUserId: 'user-112233',
-    email: 'ayayo@gmail.com',
-    firstName: 'Ayomide',
-    lastName: 'Adebisi',
-  });
+  const [student, setStudent] = useState({ ...clientConfig.student });
   const [appliedIframeSrc, setAppliedIframeSrc] = useState('');
   const [iframeLoadKey, setIframeLoadKey] = useState(0);
 
@@ -55,6 +54,7 @@ export function useEmbedDemoState() {
     }
 
     const context = buildEmbedContext({
+      embedIssuer: clientConfig.embedIssuer,
       ...org,
       ...student,
       accessToken,
@@ -86,6 +86,7 @@ export function useEmbedDemoState() {
   }, [buildIframeSrc]);
 
   return {
+    clientConfig,
     frontendUrl,
     setFrontendUrl,
     apiBaseUrl,

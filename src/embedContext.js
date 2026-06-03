@@ -3,6 +3,7 @@ const toBase64Url = (input) => {
 };
 
 export const buildEmbedContext = ({
+  embedIssuer,
   organizationId,
   institutionName,
   theme,
@@ -17,7 +18,7 @@ export const buildEmbedContext = ({
   simulateAuth,
 }) => {
   const context = {
-    issuer: 'axia-lms-demo',
+    issuer: embedIssuer,
     audience: 'mockthatinterview-embed',
     organizationId,
     accessToken: accessToken || undefined,

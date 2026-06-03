@@ -155,6 +155,7 @@ export const App = () => {
       {!immersivePractice ? (
         <Sidebar
           institutionName={embed.org.institutionName}
+          logoUrl={embed.org.logoUrl}
           activeId={nav}
           onNavigate={handleNavigate}
           mobileOpen={mobileNavOpen}

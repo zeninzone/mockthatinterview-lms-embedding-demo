@@ -4,8 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "npm run dev:axia",
+    "dev:axia": "VITE_CLIENT_SLUG=axia-africa vite",
+    "dev:cyf": "VITE_CLIENT_SLUG=codeyourfuture vite",
+    "build": "node scripts/build-github-pages.mjs",
+    "build:client": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {

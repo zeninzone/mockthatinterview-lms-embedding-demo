@@ -13,6 +13,7 @@ const icons = { LayoutDashboard, Users, Mic, Briefcase };
 
 export function Sidebar({
   institutionName,
+  logoUrl,
   activeId,
   onNavigate,
   mobileOpen,
@@ -31,7 +32,11 @@ export function Sidebar({
 
       <aside className={`sidebar ${mobileOpen ? 'sidebar--open' : ''}`}>
         <div className="sidebar__brand">
-          <div className="sidebar__mark" aria-hidden />
+          {logoUrl?.trim() ? (
+            <img className="sidebar__logo" src={logoUrl} alt="" />
+          ) : (
+            <div className="sidebar__mark" aria-hidden />
+          )}
           <div className="sidebar__brandText">
             <span className="sidebar__org">{institutionName}</span>
             <span className="sidebar__product">Learner portal</span>

@@ -26,11 +26,16 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci
-      # `GITHUB_REPOSITORY` is set on GitHub-hosted runners; vite.config.js derives Vite `base` for Pages.
+      # Multi-client build: picker at repo root, each partner under /<slug>/ (see scripts/build-github-pages.mjs).
       - run: npm run build
         env:
-          # Deployed MTI learner SPA the iframe loads (bootstrap + embedded app — match env to org token / backend).
           VITE_APP_FRONTEND_URL: https://app.dev.mockthatinterview.com
+          # Per-client secrets — each slug’s bundle only embeds its own token.
+          MTI_ORG_API_TOKEN_AXIA: ${{ secrets.MTI_ORG_API_TOKEN_AXIA }}
+          MTI_ORG_API_TOKEN_CYF: ${{ secrets.MTI_ORG_API_TOKEN_CYF }}
+          CYF_ORGANIZATION_ID: ${{ secrets.CYF_ORGANIZATION_ID }}
+          # Legacy repo secret name (Axia bootstrap only) until renamed to MTI_ORG_API_TOKEN_AXIA
+          VITE_MTI_ORG_API_TOKEN: ${{ secrets.VITE_MTI_ORG_API_TOKEN }}
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -1,34 +1,43 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-/**
- * Resolve Vite `base` for static hosting.
- * - Local / non-CI builds: `/`
- * - GitHub Actions: `GITHUB_REPOSITORY` is `owner/repo` → project Pages use `/repo/`;
- *   repos named `owner.github.io` (user/org site) use `/`
- * - Override anytime: `VITE_PAGES_BASE=/my-subpath/` (must start and end with `/` for subpaths)
- */
-function resolveBase() {
-  const manual = process.env.VITE_PAGES_BASE;
-  if (manual) {
-    return manual.endsWith('/') ? manual : `${manual}/`;
-  }
-  const repo = process.env.GITHUB_REPOSITORY;
-  if (!repo) return '/';
-  const [owner, name] = repo.split('/');
-  if (!owner || !name) return '/';
-  if (name === `${owner}.github.io`) return '/';
-  return `/${name}/`;
-}
+import { resolvePagesBase } from './scripts/pages-base.mjs';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+
+const buildTarget = process.env.VITE_BUILD_TARGET;
+const clientSlug = process.env.VITE_CLIENT_SLUG?.trim();
+const repoBase = resolvePagesBase();
+
+const base =
+  buildTarget === 'picker'
+    ? repoBase
+    : clientSlug
+      ? `${repoBase}${clientSlug}/`
+      : repoBase;
+
+const outDir = process.env.VITE_OUT_DIR || 'dist';
+
+const input =
+  buildTarget === 'picker'
+    ? resolve(__dirname, 'picker.html')
+    : resolve(__dirname, 'index.html');
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: resolveBase(),
+  base,
   plugins: [react()],
+  build: {
+    outDir,
+    emptyOutDir: true,
+    rollupOptions: {
+      input,
+    },
+  },
   server: {
     port: 4174,
-    // Chromium: cross-origin iframes need mic / on-device-speech delegated to the child's origin here
-    // and on the iframe's `allow` attribute. Tune origins for staging/production (see iframe `allow`).
     headers: {
       'Permissions-Policy':
         'microphone=(self "http://localhost:5173" "http://127.0.0.1:5173"), on-device-speech-recognition=(self "http://localhost:5173" "http://127.0.0.1:5173")',
