@@ -3,6 +3,7 @@ import { flushSync } from 'react-dom';
 
 import { getActiveClientConfig } from '../clients';
 import { generateCyfExternalUserId } from '../utils/cyfExternalUserId';
+import { isValidUuid, looksLikeApiKey, sanitizeUuidInput } from '../utils/uuid';
 
 const clientConfig = getActiveClientConfig();
 const isCyfDemo = clientConfig.slug === 'codeyourfuture';
@@ -111,17 +112,29 @@ export function InterviewPracticePage({
           onChange={(e) => setApiToken(e.target.value)}
           autoComplete="off"
           spellCheck={false}
-          placeholder={
-            isCyfDemo ? 'Organisation API key from admin' : 'Paste organisation api_key from admin'
-          }
+          placeholder="mti_sk_..."
+          title="Organisation API key from admin (starts with mti_). Not the organisation UUID."
         />
+        <span className="fieldHint muted">
+          Paste the <strong>API key</strong> from admin (<code>mti_sk_...</code>), not the organisation UUID.
+        </span>
       </label>
       <label>
         <span className="fieldLabel">Organization ID (branding context)</span>
         <input
           value={org.organizationId}
-          onChange={(e) => setOrg((prev) => ({ ...prev, organizationId: e.target.value }))}
-          placeholder={isCyfDemo ? 'Organisation UUID from admin' : 'Paste organisation id from admin'}
+          onChange={(e) =>
+            setOrg((prev) => ({
+              ...prev,
+              organizationId: sanitizeUuidInput(e.target.value),
+            }))
+          }
+          placeholder="550e8400-e29b-41d4-a716-446655440000"
+          pattern="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+          title="Organisation UUID from admin — not the API key"
+          inputMode="text"
+          autoComplete="off"
+          spellCheck={false}
         />
       </label>
       {!isCyfDemo ? (
@@ -223,6 +236,19 @@ export function InterviewPracticePage({
   );
 
   const handleContinue = () => {
+    const trimmedToken = apiToken.trim();
+    if (trimmedToken && !looksLikeApiKey(trimmedToken)) {
+      window.alert(
+        'Organisation API token must start with mti_ (e.g. mti_sk_...). Use the API key from admin, not the organisation UUID.',
+      );
+      return;
+    }
+    if (!isValidUuid(org.organizationId)) {
+      window.alert(
+        'Organization ID must be a valid UUID (e.g. 550e8400-e29b-41d4-a716-446655440000). Copy it from the organisation record in admin.',
+      );
+      return;
+    }
     if (isCyfDemo) {
       flushSync(() => {
         setStudent((prev) => ({
